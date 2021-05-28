@@ -1,5 +1,6 @@
 * {
     margin: 0;
+    font-size: 1.1rem;
 }
 
 body {
@@ -23,4 +24,20 @@ header {
 canvas {
     image-rendering: pixelated;
     width: 100%;
+}
+
+
+#title {
+    text-align: center;
+}
+
+#message {
+    text-align: center;
+}
+
+#controls {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    text-align: center;
 }
