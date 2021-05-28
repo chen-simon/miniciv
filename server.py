@@ -5,7 +5,7 @@ import json
 from game import *
 
 app = Flask(__name__)
-current_game = None # Game([], Map())
+current_game = None  # Game([], Map())
 
 
 # #### TILE DEBUGGING #### #

@@ -1,4 +1,9 @@
-""" The game's graphics. """
+""" The game's constants/configuration """
+
+BOARD_WIDTH = 40
+BOARD_HEIGHT = 16
+
+
 # Terrain Tiles
 
 GRASS_TILE = [['#5cb528', '#569e2c', '#54b048'],
