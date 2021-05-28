@@ -1,7 +1,7 @@
 """ The game module will contain the game and all its high-level classes. """
 from __future__ import annotations
 from tiles import *
-from units import Unit
+from player import Player
 
 
 class Game:
@@ -44,24 +44,8 @@ class Map:
     structure = list[list[Tile]]
     natural = list[list[Tile]]
 
-
-class Player:
-    """ A player of the game. 
-
-    Instance Attributes:
-        - name: The name of the player/civilization.    
-    """
-    name: str
-    units: list[Unit]
-    cities: list[City]
-
-    def move_unit(self) -> None:
-        """ Move the current unit in a direction"""
-        # TODO: implement this function
-
-    def end_turn(self) -> None:
-        """ ends the player's turn """
-        # TODO: implement this function
+    def __init__(self) -> None:
+        pass
 
 
 # Debug

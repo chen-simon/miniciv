@@ -1,5 +1,6 @@
 """ A module containing all the game tiles. """
 from __future__ import annotations
+from player import Player
 import graphics
 
 
@@ -33,6 +34,7 @@ class City(Tile):
         - name: The name of the city.
     """
     name: str
+    owner: Player
 
     def __init__(self) -> None:
         vis = graphics.CITY_TILE
@@ -48,6 +50,6 @@ class Road(Tile):
     road_connections: tuple[bool, bool, bool, bool]
 
     def __init__(self) -> None:
-        vis = graphics.ROAD_TILE_DEFAULT
+        vis = graphics.ROAD_TILE
 
 

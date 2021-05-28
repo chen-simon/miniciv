@@ -1,6 +1,7 @@
 """ The module containing all Miniciv's units. """
 import board
 from tiles import *
+# from player import Player
 
 
 class Unit:
@@ -10,6 +11,7 @@ class Unit:
         - moves_left: the moves this unit has left for the current turn.
         - position: the (x, y) position of the unit on the game board.
     """
+    owner: Player
     moves_left: int
     position: list[int, int]
 
@@ -55,6 +57,10 @@ class Settler(Unit):
 
     def reset_moves(self) -> None:
         self.moves_left = 4
+
+    def found_city(self, game_board) -> None:
+        """ Found a city on the game board. """
+
 
 
 class Warrior(Unit):
