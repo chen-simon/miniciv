@@ -1,6 +1,7 @@
 """ The game module will contain the game and all its high-level classes. """
 from __future__ import annotations
-from tiles import Tile
+from tiles import *
+from units import Unit
 
 
 class Game:
@@ -28,6 +29,10 @@ class Game:
         """ Update the current turn to be the turn of the next player. """
         self.current_turn = (self.current_turn + 1) % len(self.players)
 
+    def render_game(self) -> list[list[str]]:
+        """ Renders the game in a 120x48 pixel matrix of colours in the form '#FFFFFF'. """
+        # TODO: Implement this method.
+
 
 class Map:
     """ The map.
@@ -41,9 +46,14 @@ class Map:
 
 
 class Player:
-    """ A player of the game. """
+    """ A player of the game. 
 
-
+    Instance Attributes:
+        - name: The name of the player/civilization.    
+    """
+    name: str
+    units: list[Unit]
+    cities: list[City]
 
     def move_unit(self) -> None:
         """ Move the current unit in a direction"""
