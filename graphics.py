@@ -42,17 +42,3 @@ WARRIOR_UNIT = [['#000000', '#eb441e', '#000000'],
 WORKER_UNIT = [['#000000', '#eda915', '#000000'],
                ['#000000', '#dadbd7', '#000000'],
                ['#000000', '#000000', '#000000']]
-
-
-class TileGraphic:
-    """ The 3x3 pixel graphic that a tile will render as.
-
-    Instance Attributes
-        - vis: the 3x3 colour array. Colours are strings in the form '#FFFFFF' or '' empty string
-            for transparent pixels. There are no semi-transparent.
-
-    """
-    vis: list[list[str]]
-
-    def __init__(self, vis: list[list[str]]) -> None:
-        self.vis = vis
