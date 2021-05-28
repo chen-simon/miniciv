@@ -11,8 +11,8 @@ def debug_tile():
 
 @app.route('/debug/tile/')
 def send_tile():
-    from graphics import GRASS_TILE  # CHANGE THIS CODE TO SEE WHAT TILE YOU ARE LOOKING AT
-    return {'screen': GRASS_TILE}
+    import graphics  # CHANGE THIS CODE TO SEE WHAT TILE YOU ARE LOOKING AT
+    return {'screen': graphics.ROAD_TILE}
 
 
 if __name__ == '__main__':
