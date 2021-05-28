@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Window</title>
+    <script defer src="{{ url_for('static', filename='game.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header><img id="logo" src="{{ url_for('static', filename='miniciv.png')}}" /></header>
+    <canvas id="canvas" width="1920" height="768" style="background-color: black;"></canvas>
+    <div id="title">UNIT VIEW - Worker</div>
+    <div id="message">Position: [0, 0] ⠀⠀ Moves Left: 4</div>
+    <div id="controls">SPACE - Found City ⠀⠀ Arrow Keys - Move Unit ⠀⠀ TAB - Switch View</div>
+</body>
+</html>

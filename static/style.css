@@ -1,0 +1,43 @@
+* {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+body {
+    font-family: 'Monaco', monospace;
+    background-color: black;
+    color: white;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#logo {
+    height: 2rem;
+    margin: 1rem 0;
+    image-rendering: pixelated;
+}
+
+canvas {
+    image-rendering: pixelated;
+    width: 100%;
+}
+
+
+#title {
+    text-align: center;
+}
+
+#message {
+    text-align: center;
+}
+
+#controls {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    text-align: center;
+}
