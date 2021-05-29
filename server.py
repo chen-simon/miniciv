@@ -24,6 +24,11 @@ def send_tile():
     import config  # CHANGE THIS CODE TO SEE WHAT TILE YOU ARE LOOKING AT
     return {'screen': ROAD_TILE}
 
+# Start
+@app.route('/')
+def start():
+    return render_template('start.html')
+
 
 # Game
 @app.route('/game/generate/', methods=['POST'])

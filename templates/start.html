@@ -1,25 +1,50 @@
+<!--
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <link rel="stylesheet" type="text/css" href="./start_style.css" />
+    <script src="./start.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+
+     Async script executes immediately and must be after any DOM elements used in callback. 
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&libraries=&v=weekly"
+      async
+    ></script>
+  </body>
+</html>
+-->
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MiniCIV</title>
-    <script defer src="{{ url_for('static', filename='game.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Simple Map</title>
+    <script defer src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script defer src="{{ url_for('static', filename='start.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='start_style.css') }}">
 </head>
 <body>
-    <header><img id="logo" src="{{ url_for('static', filename='miniciv.png')}}" /></header>
-    <canvas id="canvas" width="1920" height="768" style="background-color: black;"></canvas>
-    <div id="info">
-        <div id="info-left">
-            <div id="title">UNIT VIEW - Worker</div>
-            <div id="message">Position: [0, 0] ⠀⠀ Moves Left: 4</div>
-        </div>
-        <div id="list">Worker, Worker, Settler, Warrior, Warrior, Worker</div>
-    </div>
-    <footer>
-        <div id="controls">SPACE - Found City ⠀⠀ Enter - Switch Unit ⠀⠀ Arrow Keys - Move Unit ⠀⠀ TAB - Switch View ⠀⠀ ESC - End Turn</div>
-    </footer>
-</body>
+    <div id="map"></div>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&libraries=&v=weekly"
+      async
+    ></script>
+  </body>
 </html>
+
