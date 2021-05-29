@@ -1,11 +1,12 @@
 * {
     margin: 0;
     font-size: 1.1rem;
+    padding: 0;
 }
 
 body {
     font-family: 'Monaco', monospace;
-    background-color: black;
+    background-color: rgb(7, 7, 7);
     color: white;
 }
 
@@ -17,7 +18,7 @@ header {
 
 #logo {
     height: 2rem;
-    margin: 1rem 0;
+    margin: 0.75rem 0;
     image-rendering: pixelated;
 }
 
@@ -26,6 +27,14 @@ canvas {
     width: 100%;
 }
 
+#info {
+    display: flex;
+    height: 100px;
+}
+
+#info-left{
+    margin-left: auto;
+}
 
 #title {
     text-align: center;
@@ -35,9 +44,25 @@ canvas {
     text-align: center;
 }
 
-#controls {
+#list {
+    margin-left: auto;
+    height: 100%;
+    width: 15rem;
+}
+
+footer {
+    background-color: rgb(31, 31, 31);
     position: fixed;
-    width: 100%;
     bottom: 0;
+    width: 100%;
     text-align: center;
+}
+
+#text-box {
+    margin: 0.5rem;
+    outline: none;
+    width: 50%;
+    background-color: black;
+    border-style: solid;
+    color: white;
 }

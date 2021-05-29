@@ -79,6 +79,14 @@ class Game:
 
                 if colour != '':
                     output[pos[1] * 3 + y][pos[0] * 3 + x] = colour
+    
+    def handle_user_input(self, keycode: str) -> None:
+        """ Handle user input for a player."""
+        self.players[self.current_turn].handle_user_input(keycode, self)
+
+    def generate_info(self):
+        """ Generate the info box of the game depending on the current game state."""
+        pass
 
 
 class Player:
@@ -90,6 +98,7 @@ class Player:
         - cities: A list of all the player's cities
         - selected_unit: The index of 'units' that the player currently has selected.
         - selected_city: The index of 'cities' that the player currently has selected.
+        - current_view: The current view of the player (of 'city', 'unit' and 'production')
     """
     name: str
     units: list[Unit]
@@ -98,21 +107,46 @@ class Player:
     selected_unit: int
     selected_city: int
 
+    current_view: str
+
     def __init__(self, name, settler_spawn_location: list[int]) -> None:
         self.name = name
         self.units = [Settler(self, settler_spawn_location)]  # This spawns the players first unit
         self.cities = []
 
+        self.selected_unit = 0
+        self.selected_city = 0
+
+        self.current_view = 'unit'
+
     def move_unit(self) -> None:
         """ Move the current unit in a direction"""
         # TODO: implement this function
 
-    def end_turn(self) -> None:
-        """ ends the player's turn """
-        # TODO: implement this function
-
     def destroy_city(self):
         pass
+
+    def handle_user_input(self, keycode: str, game: Game) -> None:
+        """ Handle user input for the current player."""
+        if keycode == 'Escape':  # The universal
+            game.next_turn()
+
+        # UNIT VIEW
+        if self.current_view == 'unit' and len(self.units) > 0:
+            if keycode == 'Tab':
+                self.current_view = 'city'
+            elif keycode == 'Space':
+                self.units[self.selected_unit].action(game)
+            elif keycode == 'Enter':
+                self.selected_unit = (self.selected_unit + 1) % len(self.units)
+            else:  # Movement
+                self.units[self.selected_unit].move_unit(keycode, game)
+
+        # CITY VIEW
+        elif self.current_view == 'city':
+            pass
+        else:  # current_view is production
+            pass
 
 
 # TILES
@@ -146,12 +180,23 @@ class City(Tile):
 
     Instance Attributes:
         - name: The name of the city.
+        - owner: The owner of the city.
+        - current_production: The unit that this city is currently producing.
+        - production_turns_left: The number of turns left until the unit is finished.
     """
     name: str
     owner: Player
+    current_production: str
+    production_turns_left: int
 
     def __init__(self) -> None:
         self.vis = config.CITY_TILE
+
+    def set_production(self, unit: str) -> None:
+        """ Sets the production of the current city. """
+
+    def update_production(self):
+        """ Updates the status of the production. """
 
 
 class Road(Tile):
@@ -190,30 +235,43 @@ class Unit:
         """ Reset the current unit's moves. """
         raise NotImplementedError
 
-    def move_unit(self, direction: str, current_tile: Tile) -> bool:
+    def move_unit(self, direction: str, game: Game) -> bool:
         """ Move the unit one tile in a direction. Return false if illegal move.
             The unit will not use up a move if the unit is standing on a road tile. """
+
+        current_structure = game.structures[self.position[1]][self.position[0]]
 
         # Not able to move if no moves left
         if self.moves_left <= 0:
             return False
 
+        new_position = self.position.copy()
         # Movement code
-        if direction == 'up' and self.position[1] < config.BOARD_HEIGHT - 1:
-            self.position[1] += 1
-        elif direction == 'down' and self.position[1] > 0:
-            self.position[1] -= 1
-        elif direction == 'left' and self.position[0] > 0:
-            self.position[0] -= 1
-        elif direction == 'right' and self.position[0] < config.BOARD_WIDTH - 1:
-            self.position[0] += 1
+        if direction == 'ArrowUp' and self.position[1] < config.BOARD_HEIGHT - 1:
+            new_position[1] += 1
+        elif direction == 'ArrowDown' and self.position[1] > 0:
+            new_position[1] -= 1
+        elif direction == 'ArrowLeft' and self.position[0] > 0:
+            new_position[0] -= 1
+        elif direction == 'ArrowRight' and self.position[0] < config.BOARD_WIDTH - 1:
+            new_position[0] += 1
         else:
             return False
 
+        # Make sure you didn't go on water
+        if isinstance(game.game_map[new_position[1]][new_position[0]], WaterTile):
+            return False
+
+        self.position = new_position
+
         # Take away a move
-        if not isinstance(current_tile, Road):
+        if not isinstance(current_structure, Road):
             self.moves_left -= 1
         return True
+
+    def action(self, game: Game):
+        """ The special action of this unit."""
+        raise NotImplementedError
 
 
 class Settler(Unit):
@@ -226,8 +284,8 @@ class Settler(Unit):
     def reset_moves(self) -> None:
         self.moves_left = 4
 
-    def found_city(self, game_board) -> None:
-        """ Found a city on the game board. """
+    def action(self, game: Game) -> bool:
+        """ Found a city on the game board. Return false if illegal move."""
 
 
 class Warrior(Unit):
@@ -240,6 +298,10 @@ class Warrior(Unit):
     def reset_moves(self) -> None:
         self.moves_left = 3
 
+    def action(self, game: Game):
+        """ Sadly, the warrior has no special action in Miniciv because of hackathon time
+         restrictions. :'( """
+
 
 class Worker(Unit):
     """ A Miniciv worker unit. """
@@ -250,6 +312,9 @@ class Worker(Unit):
 
     def reset_moves(self) -> None:
         self.moves_left = 8
+
+    def action(self, game: Game):
+        """ Build a road on the game board. Return false if illegal move."""
 
 
 # Top-level Functions

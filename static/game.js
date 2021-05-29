@@ -1,11 +1,23 @@
 const canvas = document.getElementById('canvas');
-const messageBox = document.getElementById('message');
 const ctx = canvas.getContext('2d');
 
-let timeOfLastFrame = new Date();
+// Info boxes
+const titleBox = document.getElementById('title');
+const messageBox = document.getElementById('message');
+const controlsBox = document.getElementById('controls');
+const listBox = document.getElementById('list');
+const textBox = document.getElementById('text-box');
+
+textBox.disabled = true;
+
+// Game details
 let updateLastFrame = true;
 let isUsersTurn = true;
 
+// Misc
+const validKeys =  ['Space', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'Tab', 'Enter'];
+
+// Functions
 const renderGame = (screen) => {
     for (let y = 0; y < 48; y++) {
         for (let x = 0; x < 120; x++) {
@@ -15,18 +27,32 @@ const renderGame = (screen) => {
     }
 };
 
-const getInputs = (evt) => {
-    console.log(evt.key);
-
-    updateGame({'key': evt.key});
+const updateInfo = ({title, message, list, controls}) => {
+    if (title) { titleBox.innerHTML = title; }
+    if (message) { messageBox.innerHTML = message; }
+    if (controls) { controlsBox.innerHTML = controls; }
+    if (list) { listBox.innerHTML = list; }
 };
 
-const updateGame = async (object) => {
-    const response = await fetch('/game/io/', {method: 'POST', body: JSON.stringify(object)});
+const getInputs = (evt) => {
+    if (updateLastFrame && isUsersTurn && validKeys.includes(evt.code)) { 
+        console.log(evt.code);
+        updateGame({'key': evt.code}); 
+    }
+};
+
+const updateGame = async (obj) => {
+    updateLastFrame = false;
+    // Async stuff
+    console.log(obj)
+    const response = await fetch('/game/io/', {method: 'POST', body: JSON.stringify({'key': 'ArrowUp'})});
     const data = await response.json();
+
     
     renderGame(data.screen);
-
+    updateInfo(data);
+    if (data.textBoxDisabled) { textBox.disabled = textBoxDisabled; }
+    // Game rendered
     updateLastFrame = true;
 };
 

@@ -11,8 +11,18 @@
 <body>
     <header><img id="logo" src="{{ url_for('static', filename='miniciv.png')}}" /></header>
     <canvas id="canvas" width="1920" height="768" style="background-color: black;"></canvas>
-    <div id="title">UNIT VIEW - Worker</div>
-    <div id="message">Position: [0, 0] ⠀⠀ Moves Left: 4</div>
-    <div id="controls">SPACE - Found City ⠀⠀ Arrow Keys - Move Unit ⠀⠀ TAB - Switch View</div>
+    <div id="info">
+        <div id="info-left">
+            <div id="title">UNIT VIEW - Worker</div>
+            <div id="message">Position: [0, 0] ⠀⠀ Moves Left: 4</div>
+        </div>
+        <div id="list">Worker, Worker, Settler, Warrior, Warrior, Worker</div>
+    </div>
+    <footer>
+        <div id="controls">SPACE - Found City ⠀⠀ Enter - Switch Unit ⠀⠀ Arrow Keys - Move Unit ⠀⠀ TAB - Switch View ⠀⠀ ESC - End Turn</div>
+        <form action="/game/io/">
+            <input type="text" name="text-box" id="text-box">
+        </form>
+    </footer>
 </body>
 </html>

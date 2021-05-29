@@ -1,6 +1,5 @@
 """ The game server. """
 from flask import Flask, render_template, url_for, request
-import game
 import json
 
 from game import *
@@ -36,9 +35,16 @@ def game():
     return render_template('game.html')
 
 
-@app.route('/game/io/', methods=['GET', 'POST'])
+@app.route('/game/io/', methods=['POST'])
 def game_io():
-    return {'screen': current_game.render_game()}
+    data = json.loads(request.get_data())
+
+    # Handle user input to update game state
+    if data['key']:
+        current_game.handle_user_input(data['key'])
+
+    info = current_game.generate_info()
+    return {'screen': current_game.render_game(), **info}
 
 
 if __name__ == '__main__':
