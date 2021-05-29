@@ -19,11 +19,11 @@ WATER_TILE = [['#0044ff', '#2d79eb', '#0044ff'],
 
 # Structure Tiles
 
-ROAD_TILE = [['', '#4a2912', ''],
+ROAD_TILE = [[None, '#4a2912', None],
              ['#4a2912', '#6b3c1c', '#874f29'],
-             ['', '#874f29', '']]
+             [None, '#874f29', None]]
 
-CITY_TILE = [['', '#595858', ''],
+CITY_TILE = [[None, '#595858', None],
              ['#595858', '#595858', '#595858'],
              ['#595858', '#595858', '#595858']]
 
@@ -34,18 +34,26 @@ CITY_TILE = [['', '#595858', ''],
 
 # Unit Tiles
 
-SETTLER_UNIT = [['', '#528c35', ''],
-                ['', '#dadbd7', ''],
-                ['', '', '']]
+SETTLER_UNIT = [[None, '#528c35', None],
+                [None, '#dadbd7', None],
+                [None, None, None]]
 # USE THIS HEX IF IT BLENDS INTO THE GRASS: e8e117
 
-WARRIOR_UNIT = [['', '#eb441e', ''],
-                ['', '#dadbd7', ''],
-                ['', '', '']]
+WARRIOR_UNIT = [[None, '#eb441e', None],
+                [None, '#dadbd7', None],
+                [None, None, None]]
 
-WORKER_UNIT = [['', '#eda915', ''],
-               ['', '#dadbd7', ''],
-               ['', '', '']]
+WORKER_UNIT = [[None, '#eda915', None],
+               [None, '#dadbd7', None],
+               [None, None, None]]
+
+CLOUD_TILE = [['#010502', '#010502', '#010003'],
+              ['#010101', '#010002', '#000302'],
+              ['#010005', '#030002', '#010503']]
+
+# 7x7 selection outline
+OUTLINE_COLOUR = '#AAAAFF'
+
 
 # Default city names
 DEFAULT_CITY_NAMES = {
@@ -63,4 +71,5 @@ VIEW_TEXTS = {
 }
 
 # Map generation
-WATER_THRESHOLD = 253
+WATER_COLOUR = (0, 0, 255)
+DIFF_THRESHOLD = 230

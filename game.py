@@ -16,12 +16,13 @@ class Game:
         - current_turn: The index of 'players' who's turn it currently is.
         - game_map:  A tile matrix that represents a map of the game.
         - structures:  A tile matrix that represents a map of all the structures.
-
+        - discovered_tiles: A tile matrix of whether or not a tile is covered by a cloud.
     """
     players: list[Player]
     current_turn: int
     game_map: list[list[Tile]]
     structures: list[list[Optional[Tile]]]
+    discovered_tiles: list[list[Optional[Tile]]]
 
     def __init__(self, players: list[Player], game_map: list[list[Tile]]) -> None:
         self.players = players
@@ -29,6 +30,11 @@ class Game:
         self.current_turn = 0
         self.structures = [[None for i in range(BOARD_WIDTH)]
                            for j in range(BOARD_HEIGHT)]
+        self.discovered_tiles = [[CloudTile() for i in range(BOARD_WIDTH)]
+                                 for j in range(BOARD_HEIGHT)]
+        for player in players:
+            for unit in player.units:
+                self.discover_tiles(unit.position)  # Initially discovered tiles
 
     def is_user_turn(self) -> bool:
         """ Return whether or not the current turn is the user's turn. """
@@ -55,6 +61,18 @@ class Game:
         player.cities.append(new_city)
         self.structures[position[1]][position[0]] = new_city
 
+    def discover_tiles(self, position: list[int]) -> None:
+        """ Discover new tiles on the map given a position. """
+        for y in range(position[1] - 1, position[1] + 2):
+            for x in range(position[0] - 1, position[0] + 2):
+                if self.within_map_border([x, y]):
+                    self.discovered_tiles[y][x] = None
+
+    @staticmethod
+    def within_map_border(position: list[int]) -> bool:
+        """ Return whether an [x, y] position is within the map border. """
+        return 0 <= position[0] < BOARD_WIDTH and 0 <= position[1] < BOARD_HEIGHT
+
     def render_game(self) -> list[list[str]]:
         """ Renders the game in a (3*BOARD_WIDTH)x(3*BOARD_HEIGHT) pixel matrix of colours in
             the form '#FFFFFF'.
@@ -75,6 +93,17 @@ class Game:
 
                 Game._render_vis(unit_vis, [unit.position[0], unit.position[1]], output)
 
+        # Find which item is currently selected and render the selection outline around it
+        current_player = self.players[self.current_turn]
+        focused_view = current_player.current_view
+        focused_item = current_player.units[current_player.selected_unit] \
+            if focused_view == 'unit' else current_player.cities[current_player.selected_city]
+
+        Game._render_selection_outline(focused_item.position, output)
+
+        # Cover the map with undiscovered tile clouds
+        # Game._render_tilemap(self.discovered_tiles, output)
+
         return output
 
     @staticmethod
@@ -94,8 +123,25 @@ class Game:
             for x in range(3):
                 colour = vis[y][x]
 
-                if colour != '':
+                if colour:
                     output[pos[1] * 3 + y][pos[0] * 3 + x] = colour
+
+    @staticmethod
+    def _render_selection_outline(pos: list[int], output: list[list[str]]) -> None:
+        """ Render the selection outline to the output matrix. """
+        selection_outline = [[OUTLINE_COLOUR if max(i, j) == 6 or min(i, j) == 0 else None
+                              for i in range(7)] for j in range(7)]
+        for y in range(7):
+            for x in range(7):
+                colour = selection_outline[y][x]
+
+                if colour and Game._vis_within_map_border([x, y]):
+                    output[pos[1] * 3 - 2 + y][pos[0] * 3 - 2 + x] = colour
+
+    @staticmethod
+    def _vis_within_map_border(vis_pos: list[int]) -> bool:
+        """ Return whether an [x, y] vis position is within the map render border. """
+        return 0 <= vis_pos[0] < BOARD_WIDTH * 3 and 0 <= vis_pos[1] < BOARD_HEIGHT * 3
 
     def handle_user_input(self, keycode: str) -> None:
         """ Handle user input for a player."""
@@ -245,6 +291,13 @@ class Road(Tile):
         self.vis = ROAD_TILE
 
 
+class CloudTile(Tile):
+    """ A cloud tile. """
+
+    def __init__(self):
+        self.vis = CLOUD_TILE
+
+
 # UNITS
 
 
@@ -282,19 +335,18 @@ class Unit:
 
         new_position = self.position.copy()
         # Movement code
-        if direction == 'ArrowDown' and self.position[1] < BOARD_HEIGHT - 1:
+        if direction == 'ArrowDown':
             new_position[1] += 1
-        elif direction == 'ArrowUp' and self.position[1] > 0:
+        elif direction == 'ArrowUp':
             new_position[1] -= 1
-        elif direction == 'ArrowLeft' and self.position[0] > 0:
+        elif direction == 'ArrowLeft':
             new_position[0] -= 1
-        elif direction == 'ArrowRight' and self.position[0] < BOARD_WIDTH - 1:
+        elif direction == 'ArrowRight':
             new_position[0] += 1
-        else:
-            return False
 
-        # Make sure you didn't go on water
-        if isinstance(game.game_map[new_position[1]][new_position[0]], WaterTile):
+        # Make sure you didn't go on water or outside of the map
+        if isinstance(game.game_map[new_position[1]][new_position[0]], WaterTile) \
+                or not game.within_map_border(new_position):
             return False
 
         self.position = new_position
@@ -303,6 +355,9 @@ class Unit:
         # Take away a move
         if not isinstance(current_structure, Road):
             self.moves_left -= 1
+
+        # Discover new tiles
+        game.discover_tiles(self.position)
         return True
 
     def action(self, game: Game):
