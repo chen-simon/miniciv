@@ -55,16 +55,24 @@ CLOUD_TILE = [['#010502', '#010502', '#010003'],
 OUTLINE_COLOURS = {
     'America': '#9999FF',
     'Spain': '#FFFF99',
-    'Russia': '#FF9999'
-    }
+    'Russia': '#FF9999',
+    'Australia': '#',
+    'China': '#',
+    'Britain': '#',
+    'Germany': '#'
+}
 
 
 # Default city names
 DEFAULT_CITY_NAMES = {
-    'Spain': ['Madrid', ],
-    'America': ['Washington', 'New York', 'Philidelphia', 'Boston', 'Baltimore', 'Charleston',
+    'Spain': ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Palma', 'Bilbao', 'Alicante', 'Cordova'],
+    'America': ['Washington', 'New York', 'Philadelphia', 'Boston', 'Baltimore', 'Charleston',
                 'New Orleans', 'Cincinnati', 'Los Angeles'],
-    'Russia': [],
+    'Russia': ['Moscow', 'St.-Petersburg', 'Sverdlovsk', 'Nizhny', 'Samara', 'Omsk', 'Tatarstan', 'Rostov', 'Chelyabinsk'],
+    'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Canberra', 'Newcastle', 'Geelong'],
+    'China': ['Shanghai', 'Beijing', 'Tianjin', 'Guangzhou', 'Shenzhen', 'Dongguan', 'Chongqing', 'Nanjing', 'Nanchong'],
+    'Britain': ['London', 'Birmingham', 'Liverpool', 'Sheffield', 'Bristol', 'Glasgow', 'Leicester', 'Edinburgh', 'Leeds'],
+    'Germany': ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Essen', 'Stuttgart', 'Dortmund', 'Bremen', 'Leipzig'],
 }
 
 # Infobox rendering
