@@ -31,7 +31,7 @@ def start_game():
                Player('Spain', choice(valid_positions)), Player('Russia',
                                                                 choice(valid_positions))]
 
-    new_game = Game(players, game_map, enable_discovery_tiles=False)
+    new_game = Game(players, game_map, enable_discovery_tiles=True)
 
     current_game[0] = new_game  # Python-scoping jankiness for persistent server session
 
