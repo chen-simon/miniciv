@@ -56,23 +56,28 @@ OUTLINE_COLOURS = {
     'America': '#9999FF',
     'Spain': '#FFFF99',
     'Russia': '#FF9999',
-    'Australia': '#',
-    'China': '#',
-    'Britain': '#',
-    'Germany': '#'
+    'Australia': '#CCCCCC',
+    'China': '#FFCCCC',
+    'Britain': '#9999FF',
+    'Germany': '#FF9999'
 }
-
 
 # Default city names
 DEFAULT_CITY_NAMES = {
-    'Spain': ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Palma', 'Bilbao', 'Alicante', 'Cordova'],
+    'Spain': ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Palma', 'Bilbao',
+              'Alicante', 'Cordova'],
     'America': ['Washington', 'New York', 'Philadelphia', 'Boston', 'Baltimore', 'Charleston',
                 'New Orleans', 'Cincinnati', 'Los Angeles'],
-    'Russia': ['Moscow', 'St.-Petersburg', 'Sverdlovsk', 'Nizhny', 'Samara', 'Omsk', 'Tatarstan', 'Rostov', 'Chelyabinsk'],
-    'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Canberra', 'Newcastle', 'Geelong'],
-    'China': ['Shanghai', 'Beijing', 'Tianjin', 'Guangzhou', 'Shenzhen', 'Dongguan', 'Chongqing', 'Nanjing', 'Nanchong'],
-    'Britain': ['London', 'Birmingham', 'Liverpool', 'Sheffield', 'Bristol', 'Glasgow', 'Leicester', 'Edinburgh', 'Leeds'],
-    'Germany': ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Essen', 'Stuttgart', 'Dortmund', 'Bremen', 'Leipzig'],
+    'Russia': ['Moscow', 'St.-Petersburg', 'Sverdlovsk', 'Nizhny', 'Samara', 'Omsk', 'Tatarstan',
+               'Rostov', 'Chelyabinsk'],
+    'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Canberra',
+                  'Newcastle', 'Geelong'],
+    'China': ['Shanghai', 'Beijing', 'Tianjin', 'Guangzhou', 'Shenzhen', 'Dongguan', 'Chongqing',
+              'Nanjing', 'Nanchong'],
+    'Britain': ['London', 'Birmingham', 'Liverpool', 'Sheffield', 'Bristol', 'Glasgow', 'Leicester',
+                'Edinburgh', 'Leeds'],
+    'Germany': ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Essen', 'Stuttgart', 'Dortmund',
+                'Bremen', 'Leipzig'],
 }
 
 # Infobox rendering

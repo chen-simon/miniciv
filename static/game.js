@@ -47,6 +47,7 @@ const updateGame = async (obj) => {
     
     renderGame(data.screen);
     updateInfo(data);
+    
     // Game rendered
     updateLastFrame = true;
 };

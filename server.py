@@ -1,6 +1,7 @@
 """ The game server. """
 from flask import Flask, render_template, url_for, request, redirect
 import json
+from random import choice
 
 from config import *
 import map_generation
@@ -8,7 +9,8 @@ from game import *
 
 app = Flask(__name__)
 
-current_game = [None]
+current_game = [Game([], [])]
+
 
 # Start
 @app.route('/')
@@ -21,19 +23,19 @@ def start_game():
     data = json.loads(request.get_data())
 
     # THIS INITIALIZES THE GAME
-    # data = json.loads(request.get_data())
-    # game_map = map_generation.generate(data['lat'], data['long'], data['zoom'])
-    # players = [Player(data['playername'], [4, 4]), Player('Zulu', [0, 4]), Player('Russia', [8, 4])]
+    data = json.loads(request.get_data())
+    game_map = map_generation.generate(data['lat'], data['lng'], data['zoom'])
+    valid_positions = Game.get_valid_positions(game_map)
+    players = [Player(data['playername'], choice(valid_positions)),
+               Player('Spain', choice(valid_positions)), Player('Russia',
+                                                                choice(valid_positions))]
 
-    # current_game = Game(players, game_map, enable_discovery_tiles=False)
-        
-    players = [Player('America', [2, 2]), Player('Spain', [4, 4])]
-    game_map = map_generation.example_map()
     new_game = Game(players, game_map, enable_discovery_tiles=False)
 
     current_game[0] = new_game  # Python-scoping jankiness for persistent server session
 
     return {}
+
 
 # Game
 @app.route('/game/generate/', methods=['POST'])

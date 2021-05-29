@@ -19,7 +19,7 @@ def generate(lat: float, long: float, zoom: int) -> list[list[Tile]]:
     params_text = f'center={lat},{long}&zoom={zoom}'
 
     image = google_maps_url_to_image(main_url + params_text + tail + api_key)
-    image.show()
+    return _generate_gameboard(image)
 
 
 def _generate_gameboard(image: Image) -> list[list[Tile]]:

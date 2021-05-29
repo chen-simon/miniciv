@@ -63,7 +63,7 @@ class Game:
 
     def create_city(self, player: Player, position: list[int]) -> None:
         """ Create a new city in the game. """
-        new_city = City('Madrid', player, position)
+        new_city = City(DEFAULT_CITY_NAMES[player.name][len(player.cities)], player, position)
         player.cities.append(new_city)
         self.structures[position[1]][position[0]] = new_city
 
@@ -166,6 +166,16 @@ class Game:
                     output[vis_pos[1]][vis_pos[0]] = colour
 
     @staticmethod
+    def get_valid_positions(board: list[list[Tile]]) -> list[list[int]]:
+        """ Given a map, return all the valid spawn tiles."""
+        valid_tiles = [[20, 8]]
+        for y in range(len(board)):
+            for x in range(len(board)):
+                if isinstance(board[y][x], GrassTile):
+                    valid_tiles.append([x, y])
+        return valid_tiles
+
+    @staticmethod
     def _vis_within_map_border(vis_pos: list[int]) -> bool:
         """ Return whether an [x, y] vis position is within the map render border. """
         return 0 <= vis_pos[0] < BOARD_WIDTH * 3 and 0 <= vis_pos[1] < BOARD_HEIGHT * 3
@@ -211,8 +221,6 @@ class Game:
                 'message': message,
                 'list': ', '.join(lst),
                 'controls': controls}
-
-        # TODO: Fix the thing where when you have no units, you can't be in unit view.
 
 
 class Player:
@@ -297,9 +305,11 @@ class Player:
         """ Switches the view or detects if eliminated. """
         if not self.units and self.current_view not in {'city', 'production'}:
             self.current_view = 'city'
+            self.selected_city = 0
 
         if not self.cities:
             self.current_view = 'unit'
+            self.selected_unit = 0
 
         if not self.cities and not self.units:
             self.eliminated = True
@@ -399,7 +409,6 @@ class Road(Tile):
     def update_road(self, connections: tuple[bool, bool, bool, bool]):
         """ Updates the road graphic.  up, down, left right order """
         self.clear_road()
-        print('eeeeeeeeeeeeee')
 
         if connections[0]:
             self.vis[0][1] = ROAD_TILE[0][1]

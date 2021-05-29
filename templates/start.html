@@ -12,15 +12,27 @@
     <header><img src="{{url_for('static', filename='miniciv.png')}}" id="logo"></header>
     <div id="container">
       <div id="box">
+        <div>Choose your Miniciv game location:</div>
+        <br/>
         <div id="map"></div>
         <form action="/game/">
+          <label for="data">Select your Civilization: </label>
+          <select name="data" id="data">
+            <option value="America">America</option>
+            <option value="Spain">Spain</option>
+            <option value="Russia">Russia</option>
+            <option value="China">China</option>
+            <option value="Australia">Australia</option>
+            <option value="Britain">Britain</option>
+            <option value="Germany">Germany</option>
+          </select>
           <button onclick="startGame()">Start Game</button> 
         </form>
       </div>
     </div>
 
     <script
-      src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&libraries=&v=weekly"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_NnU8wRTS5S0dFjS_5kUhtuetWqY0xWI&callback=initMap&libraries=&v=weekly"
       async
     ></script>
   </body>
