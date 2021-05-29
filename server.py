@@ -51,6 +51,7 @@ def game_io():
 
 if __name__ == '__main__':
     p = [Player('America', [2, 2]), Player('Spain', [4, 4])]
+    p[0].units.append(Worker(p[0], [30, 5]))
     m = example_map()
     current_game = Game(p, m, enable_discovery_tiles=False)
 

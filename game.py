@@ -74,6 +74,23 @@ class Game:
                 if self.within_map_border([x, y]):
                     self.discovered_tiles[y][x] = None
 
+    def update_road_graphic(self, position: list[int]) -> None:
+        """ Update the road graphic at the given position assuming there's a road there. """
+        test_positions = [[position[0], position[1] + 1],
+                          [position[0], position[1] - 1],
+                          [position[0] + 1, position[1]],
+                          [position[0] - 1, position[1]]]  # up, down, left, right
+
+        lst = [False, False, False, False]
+
+        for i in range(len(test_positions)):
+            check_position = test_positions[i]
+            if self.within_map_border(check_position) and \
+                    isinstance(self.structures[check_position[1]][check_position[0]], Road):
+                lst[i] = True
+
+        self.structures[position[1]][position[0]].update_road(tuple(lst))
+
     @staticmethod
     def within_map_border(position: list[int]) -> bool:
         """ Return whether an [x, y] position is within the map border. """
@@ -236,7 +253,7 @@ class Player:
     def handle_user_input(self, keycode: str, game: Game) -> None:
         """ Handle user input for the current player."""
 
-        if keycode == 'Escape':  # The universal
+        if keycode == 'Escape':  # The universal end turn key
             game.next_turn()
 
         # UNIT VIEW
@@ -263,17 +280,19 @@ class Player:
         elif self.current_view == 'production' and len(self.cities) > 0:
             if keycode == 'Tab':
                 self.current_view = 'city'
-            elif keycode == 'Space':
-                self.current_view = 'production'
-            elif keycode == 'Enter':
-                self.selected_city = (self.selected_city + 1) % len(self.cities)
+            elif keycode == 'ArrowUp':
+                self.cities[self.selected_city].set_production('Settler')
+            elif keycode == 'ArrowLeft':
+                self.cities[self.selected_city].set_production('Warrior')
+            elif keycode == 'ArrowRight':
+                self.cities[self.selected_city].set_production('Worker')
 
         # Lastly, update the player state
         self.update_player_state(game)
 
     def update_player_state(self, game: Game) -> None:
         """ Switches the view or detects if eliminated. """
-        if not self.units:
+        if not self.units and self.current_view not in {'city', 'production'}:
             self.current_view = 'city'
 
         if not self.cities:
@@ -296,7 +315,7 @@ class Tile:
         - vis: the 3x3 colour array. Colours are strings in the form '#FFFFFF' or '' empty string
             for transparent pixels. There are no semi-transparent.
     """
-    vis: list[list[str]]
+    vis: list[list[Optional[str]]]
 
 
 class GrassTile(Tile):
@@ -325,7 +344,7 @@ class City(Tile):
     """
     name: str
     owner: Player
-    current_production: str
+    current_production: Optional[str]
     production_turns_left: int
     position: list[int]
 
@@ -333,15 +352,33 @@ class City(Tile):
         self.vis = CITY_TILE
         self.name = name
         self.owner = owner
-        self.current_production = ''
+        self.current_production = None
         self.production_turns_left = 0
         self.position = position
 
     def set_production(self, unit: str) -> None:
         """ Sets the production of the current city. """
+        self.owner.current_view = 'city'
+        self.current_production = unit
+        self.production_turns_left = 4
 
-    def update_production(self):
+    def update_production(self) -> None:
         """ Updates the status of the production. """
+        if self.current_production:
+            self.production_turns_left -= 1
+
+            if self.production_turns_left <= 0:
+                self.finish_production()
+
+    def finish_production(self) -> None:
+        """ Finishes the production. """
+        new_unit = Settler(self.owner, self.position) if self.current_production == 'Settler' \
+            else (Warrior(self.owner, self.position) if self.current_production == 'Warrior'
+                  else Worker(self.owner, self.position))
+        # Gotta love these nested ternary operators ^   😎
+
+        self.current_production = None
+        self.owner.units.append(new_unit)
 
 
 class Road(Tile):
@@ -355,6 +392,25 @@ class Road(Tile):
 
     def __init__(self) -> None:
         self.vis = ROAD_TILE
+
+    def update_road(self, connections: tuple[bool, bool, bool, bool]):
+        """ Updates the road graphic.  up, down, left right order """
+        self.clear_road()
+        print('eeeeeeeeeeeeee')
+
+        if connections[0]:
+            self.vis[0][1] = ROAD_TILE[0][1]
+        if connections[1]:
+            self.vis[2][1] = ROAD_TILE[2][1]
+        if connections[2]:
+            self.vis[1][0] = ROAD_TILE[1][0]
+        if connections[3]:
+            self.vis[1][2] = ROAD_TILE[1][2]
+
+    def clear_road(self):
+        """ Clear road. """
+        self.vis = [[ROAD_TILE[j][i] if i == 1 and j == 1 else None
+                     for i in range(3)] for j in range(3)]
 
 
 class CloudTile(Tile):
@@ -413,8 +469,13 @@ class Unit:
             new_position[0] += 1
 
         # Make sure you didn't go on water or outside of the map
-        if not game.within_map_border(new_position) or \
-                isinstance(game.game_map[new_position[1]][new_position[0]], WaterTile):
+        if not game.within_map_border(new_position):
+            return False
+
+        # Water/road test
+        if isinstance(game.game_map[new_position[1]][new_position[0]], WaterTile) and \
+                not isinstance(game.structures[new_position[1]][new_position[0]], Road) \
+                and self.name != 'Worker':
             return False
 
         self.position = new_position
@@ -447,6 +508,9 @@ class Settler(Unit):
 
     def action(self, game: Game) -> bool:
         """ Found a city on the game board. Return false if illegal move."""
+        if self.moves_left == 0:
+            return False
+
         if not game.structures[self.position[1]][self.position[0]] \
                 and not isinstance(game.game_map[self.position[1]][self.position[0]], WaterTile):
             # Creates the city, then removes itself from the game.
@@ -489,6 +553,15 @@ class Worker(Unit):
 
     def action(self, game: Game):
         """ Build a road on the game board. Return false if illegal move."""
+        if self.moves_left == 0:
+            return False
+
+        if not game.structures[self.position[1]][self.position[0]]:
+            self.moves_left -= 1
+            game.structures[self.position[1]][self.position[0]] = Road()
+            game.update_road_graphic(self.position)
+            return True
+        return False
 
 
 # Top-level Functions
