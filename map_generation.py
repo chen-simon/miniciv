@@ -1,7 +1,6 @@
 """ A moduole to convert a given image to a miniciv gameboard map"""
 from typing import Any
 from PIL import Image, ImageEnhance
-from tiles import Tile
 
 
 def generate_gameboard() -> list[list[str]]:

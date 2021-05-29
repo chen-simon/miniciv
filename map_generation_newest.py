@@ -1,13 +1,14 @@
 """ A moduole to convert a given image to a miniciv gameboard map"""
 from typing import Any
 from PIL import Image, ImageEnhance
-from tiles import Tile
 
 
-def generate_gameboard() -> list[list[str]]:
+def generate_gameboard() -> Any:
     """Create the gameboard given an image"""
-    img1 = image_resize('testermap.png')
-    img2 = pixelate(img1, 4)
+    img = Image.open('testermap.png')
+
+    resized_image = image_resize('testermap.png')
+    pixelated_image = pixelate(resized_image, 16)
 
 
 def image_resize(path: str) -> Any:
@@ -21,25 +22,25 @@ def image_resize(path: str) -> Any:
     return img
 
 
-# def color_correction():
-#     img = Image.open('testermap.png')
-#     corrected = ImageEnhance.Color(img)
-#     corrected.enhance(300).show()
-
-def pixelate(image: str, pixel_size: int) -> list:
+def pixelate(path, pixel_size):
     """Pixelates a given image into individual 16x16 pixels
-    Credit: https://dev.to/natamacm/turn-photos-into-pixel-art-with-python-32pc"""
+        Credit: https://dev.to/natamacm/turn-photos-into-pixel-art-with-python-32pc"""
     rgb_list = []
-    img = Image.open(image)
-    image = Image.resize((img.size[0] // pixel_size, img.size[1] // pixel_size), Image.NEAREST)
-    image = Image.resize((img.size[0] * pixel_size, img.size[1] * pixel_size), Image.NEAREST)
-    """Credit: https://www.kite.com/python/answers/how-to-list-pixel-values-from-a-pil-image-in-python"""
-    sequence_of_pixels = image.getdata()
-    for i in range(len(sequence_of_pixels)):
-        temp = (list(sequence_of_pixels[i]))
-        del temp[-1]
-        rgb_list.append(temp)
-    print(rgb_list)
+    path = path.convert("RGB")
+    #image = path.resize((path.size[0] // pixel_size, path.size[1] // pixel_size), Image.NEAREST)
+    #image = path.resize((path.size[0] * pixel_size, path.size[1] * pixel_size), Image.NEAREST)
+    list_of_pixels = list(path.getdata())
+    #path.show()
+    #path.save('sss.png')
+    print(list_of_pixels)
+
+
+
+    # for i in range(len(list_of_pixels)):
+    #     print('11111')
+    #     temp = list(list_of_pixels)
+    #     rgb_list.append(temp)
+    # print(rgb_list)
 
 
 def tile_picker(rgb_list):
@@ -48,16 +49,9 @@ def tile_picker(rgb_list):
         print(i)
 
 
-
-
-
-
-
-
-
 # def threshhold(image, value):
 #     an_image = Image.open("testermap.png")
-#     sequence_of_pixels = an_image.getdata()
+#     sequence_of_pixels = an_imagege.getdata()
 #     list_of_pixels = list(sequence_of_pixels)
 #
 #     print(list_of_pixels)
