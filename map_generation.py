@@ -3,6 +3,7 @@ from typing import Any
 from PIL import Image
 import requests
 
+from api_key import API_KEY
 import config
 from game import Tile, GrassTile, WaterTile
 
@@ -13,12 +14,11 @@ def generate(lat: float, long: float, zoom: int) -> list[list[Tile]]:
     tail = '&size=640x256&maptype=roadmap&style=feature:all%7Cvisibility:off&style=feature' \
            ':landscape%7Cvisibility:on&style=feature:landscape%7Celement:geometry.fill%7Ccolor' \
            ':0x000000&style=feature:water%7Cvisibility:on&style=feature:water%7Celement:geometry' \
-           '.fill%7Ccolor:0x0000FF'
-    api_key = '&key=AIzaSyB_NnU8wRTS5S0dFjS_5kUhtuetWqY0xWI'
+           '.fill%7Ccolor:0x0000FF&key='
 
     params_text = f'center={lat},{long}&zoom={zoom}'
 
-    image = google_maps_url_to_image(main_url + params_text + tail + api_key)
+    image = google_maps_url_to_image(main_url + params_text + tail + API_KEY)
     return _generate_gameboard(image)
 
 

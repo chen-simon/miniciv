@@ -3,6 +3,7 @@ from flask import Flask, render_template, url_for, request, redirect
 import json
 from random import choice
 
+from api_key import API_KEY
 from config import *
 import map_generation
 from game import *
@@ -15,7 +16,7 @@ current_game = [Game([], [])]
 # Start
 @app.route('/')
 def start():
-    return render_template('start.html')
+    return render_template('start.html', api_key=API_KEY)
 
 
 @app.route('/start/', methods=['POST'])
