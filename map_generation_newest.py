@@ -25,6 +25,7 @@ def image_resize(path: str) -> Any:
 def pixelate(path, pixel_size):
     """Pixelates a given image into individual 16x16 pixels
         Credit: https://dev.to/natamacm/turn-photos-into-pixel-art-with-python-32pc"""
+    tile_list = []
     rgb_list = []
     path = path.convert("RGB")
     #image = path.resize((path.size[0] // pixel_size, path.size[1] // pixel_size), Image.NEAREST)
@@ -32,9 +33,18 @@ def pixelate(path, pixel_size):
     list_of_pixels = list(path.getdata())
     #path.show()
     #path.save('sss.png')
-    print(list_of_pixels)
+    #print(list_of_pixels)
+    for i in range(len(list_of_pixels)):
+        temp = list_of_pixels[i]
+        rgb_list.append(list(temp))
+    #print(rgb_list)
 
-
+    for i in range(len(rgb_list)):
+        if rgb_list[i][-1] > 250:
+            tile_list.append('WATER_TILE')
+        else:
+            tile_list.append('GRASS_TILE')
+    print(tile_list)
 
     # for i in range(len(list_of_pixels)):
     #     print('11111')
