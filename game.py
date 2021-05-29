@@ -74,12 +74,12 @@ class Game:
                 if self.within_map_border([x, y]):
                     self.discovered_tiles[y][x] = None
 
-    def update_road_graphic(self, position: list[int]) -> None:
+    def update_road_graphic(self, position: list[int], visited: set[tuple[int, int]]) -> None:
         """ Update the road graphic at the given position assuming there's a road there. """
-        test_positions = [[position[0], position[1] + 1],
-                          [position[0], position[1] - 1],
-                          [position[0] + 1, position[1]],
-                          [position[0] - 1, position[1]]]  # up, down, left, right
+        test_positions = [[position[0], position[1] - 1],
+                          [position[0], position[1] + 1],
+                          [position[0] - 1, position[1]],
+                          [position[0] + 1, position[1]]]  # up, down, left, right
 
         lst = [False, False, False, False]
 
@@ -88,6 +88,9 @@ class Game:
             if self.within_map_border(check_position) and \
                     isinstance(self.structures[check_position[1]][check_position[0]], Road):
                 lst[i] = True
+                if tuple(check_position) not in visited:  # Recursive :o
+                    visited.add(tuple(check_position))
+                    self.update_road_graphic(check_position, visited)
 
         self.structures[position[1]][position[0]].update_road(tuple(lst))
 
@@ -193,7 +196,7 @@ class Game:
 
             if current_player.current_view == 'city':
                 message = f"Position: {current_city.position} ⠀⠀ " \
-                          f"Production: {current_city.current_production}" \
+                          f"Production: {current_city.current_production} " \
                           f"({current_city.production_turns_left} Turns left.)"
 
                 controls = "SPACE - Choose Production ⠀⠀ Enter - Switch City ⠀⠀ " \
@@ -559,7 +562,7 @@ class Worker(Unit):
         if not game.structures[self.position[1]][self.position[0]]:
             self.moves_left -= 1
             game.structures[self.position[1]][self.position[0]] = Road()
-            game.update_road_graphic(self.position)
+            game.update_road_graphic(self.position, set())
             return True
         return False
 
