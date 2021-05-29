@@ -4,10 +4,9 @@
 
 ## Installation Instructions
 
-```bash
 1. Clone the repository to your machine
-2. Simply run server.py
-3. Open the chrome web browser
-4. Search: http://localhost:5000/ 
-5. Game On 🕹️
-```
+1. Open `api_key.py` and assign `API_KEY` to your google api maps key (make sure you have google maps static api and javascript api enabled)
+1. Simply run server.py
+1. Open http://localhost:5000/ in the browser 
+1. Game On 🕹️
+
