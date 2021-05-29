@@ -2,7 +2,7 @@
 from __future__ import annotations
 from typing import Optional
 
-import config
+from config import *
 
 
 # GAME
@@ -27,8 +27,8 @@ class Game:
         self.players = players
         self.game_map = game_map
         self.current_turn = 0
-        self.structures = [[None for i in range(config.BOARD_WIDTH)]
-                           for j in range(config.BOARD_HEIGHT)]
+        self.structures = [[None for i in range(BOARD_WIDTH)]
+                           for j in range(BOARD_HEIGHT)]
 
     def is_user_turn(self) -> bool:
         """ Return whether or not the current turn is the user's turn. """
@@ -37,6 +37,17 @@ class Game:
     def next_turn(self) -> None:
         """ Update the current turn to be the turn of the next player. """
         self.current_turn = (self.current_turn + 1) % len(self.players)
+
+        # Resets all the moves for all the units of the new current player.
+        new_current_player = self.players[self.current_turn]
+        for unit in new_current_player.units:
+            unit.reset_moves()
+
+        # Update the production for all the cities of the new current player.
+        for city in new_current_player.cities:
+            city.update_production()
+
+        print(f"It is now {self.players[self.current_turn].name}'s turn.")
 
     def create_city(self, player: Player, position: list[int]) -> None:
         """ Create a new city in the game. """
@@ -48,8 +59,8 @@ class Game:
         """ Renders the game in a (3*BOARD_WIDTH)x(3*BOARD_HEIGHT) pixel matrix of colours in
             the form '#FFFFFF'.
         """
-        output = [['#000000' for i in range(config.BOARD_WIDTH * 3)]
-                  for j in range(config.BOARD_HEIGHT * 3)]
+        output = [['#000000' for i in range(BOARD_WIDTH * 3)]
+                  for j in range(BOARD_HEIGHT * 3)]
 
         # Render map & structures
         Game._render_tilemap(self.game_map, output)
@@ -59,8 +70,8 @@ class Game:
         for player in self.players:
             for unit in player.units:
                 # Rip this nested ternary operator 😔
-                unit_vis = config.SETTLER_UNIT if isinstance(unit, Settler) else \
-                    (config.WARRIOR_UNIT if isinstance(unit, Warrior) else config.WORKER_UNIT)
+                unit_vis = SETTLER_UNIT if isinstance(unit, Settler) else \
+                    (WARRIOR_UNIT if isinstance(unit, Warrior) else WORKER_UNIT)
 
                 Game._render_vis(unit_vis, [unit.position[0], unit.position[1]], output)
 
@@ -69,8 +80,8 @@ class Game:
     @staticmethod
     def _render_tilemap(tilemap: list[list[Tile]], output: list[list[str]]) -> None:
         """ Helper function for render_game() that renders tilemaps to the output matrix. """
-        for tile_y in range(config.BOARD_HEIGHT):
-            for tile_x in range(config.BOARD_WIDTH):
+        for tile_y in range(BOARD_HEIGHT):
+            for tile_x in range(BOARD_WIDTH):
                 current_tile = tilemap[tile_y][tile_x]
 
                 if current_tile:
@@ -92,7 +103,17 @@ class Game:
 
     def generate_info(self) -> dict[str, str]:
         """ Generate the info box of the game depending on the current game state."""
-        return {}
+        current_player = self.players[self.current_turn]
+
+        current_view_text = VIEW_TEXTS[current_player.current_view]
+        if current_player.current_view == 'unit':
+            current_name = current_player.units[current_player.selected_unit].name
+        else:
+            current_name = current_player.cities[current_player.selected_city].name
+
+        return {'title': f'{current_view_text} - {current_name}'}
+
+        # TODO: Fix the thing where when you have no units, you can't be in unit view.
 
 
 class Player:
@@ -105,6 +126,8 @@ class Player:
         - selected_unit: The index of 'units' that the player currently has selected.
         - selected_city: The index of 'cities' that the player currently has selected.
         - current_view: The current view of the player (of 'city', 'unit' and 'production')
+        - eliminated: Whether or not the player is eliminated.
+            (Players are eliminated when all their units and cities are destroyed)
     """
     name: str
     units: list[Unit]
@@ -114,6 +137,8 @@ class Player:
     selected_city: int
 
     current_view: str
+
+    eliminated: bool
 
     def __init__(self, name, settler_spawn_location: list[int]) -> None:
         self.name = name
@@ -136,7 +161,6 @@ class Player:
 
         # UNIT VIEW
         if self.current_view == 'unit' and len(self.units) > 0:
-            print(keycode)
             if keycode == 'Tab':
                 self.current_view = 'city'
             elif keycode == 'Space':
@@ -170,14 +194,14 @@ class GrassTile(Tile):
     """ A grass tile """
 
     def __init__(self) -> None:
-        self.vis = config.GRASS_TILE
+        self.vis = GRASS_TILE
 
 
 class WaterTile(Tile):
     """ A water tile. """
 
     def __init__(self) -> None:
-        self.vis = config.WATER_TILE
+        self.vis = WATER_TILE
 
 
 class City(Tile):
@@ -195,7 +219,7 @@ class City(Tile):
     production_turns_left: int
 
     def __init__(self, name: str, owner: Player) -> None:
-        self.vis = config.CITY_TILE
+        self.vis = CITY_TILE
         self.name = name
         self.owner = owner
         self.current_production = ''
@@ -218,7 +242,7 @@ class Road(Tile):
     road_connections: tuple[bool, bool, bool, bool]
 
     def __init__(self) -> None:
-        self.vis = config.ROAD_TILE
+        self.vis = ROAD_TILE
 
 
 # UNITS
@@ -228,10 +252,12 @@ class Unit:
     """ A Miniciv unit abstract class.
 
     Instance Attributes
+        - name: The unit name (the same as unit type)
         - owner: The player who owns this unit.
         - moves_left: the moves this unit has left for the current turn.
         - position: the (x, y) position of the unit on the game board.
     """
+    name: str
     owner: Player
     moves_left: int
     position: list[int]
@@ -256,13 +282,13 @@ class Unit:
 
         new_position = self.position.copy()
         # Movement code
-        if direction == 'ArrowUp' and self.position[1] < config.BOARD_HEIGHT - 1:
+        if direction == 'ArrowDown' and self.position[1] < BOARD_HEIGHT - 1:
             new_position[1] += 1
-        elif direction == 'ArrowDown' and self.position[1] > 0:
+        elif direction == 'ArrowUp' and self.position[1] > 0:
             new_position[1] -= 1
         elif direction == 'ArrowLeft' and self.position[0] > 0:
             new_position[0] -= 1
-        elif direction == 'ArrowRight' and self.position[0] < config.BOARD_WIDTH - 1:
+        elif direction == 'ArrowRight' and self.position[0] < BOARD_WIDTH - 1:
             new_position[0] += 1
         else:
             return False
@@ -272,7 +298,7 @@ class Unit:
             return False
 
         self.position = new_position
-        print(new_position)
+        print(f"Moved {self.owner.name}'s {self.name} to {new_position}.")
 
         # Take away a move
         if not isinstance(current_structure, Road):
@@ -290,6 +316,7 @@ class Settler(Unit):
     def __init__(self, owner: Player, position: list[int]) -> None:
         super().__init__(owner, position)
         self.moves_left = 4
+        self.name = 'Settler'
 
     def reset_moves(self) -> None:
         self.moves_left = 4
@@ -301,6 +328,8 @@ class Settler(Unit):
             # Creates the city, then removes itself from the game.
             game.create_city(self.owner, self.position)
             self.owner.remove_unit(self)
+
+            print(f'{self.owner.name} founded the city {self.owner.cities[-1].name}.')
             return True
         return False
 
@@ -311,6 +340,7 @@ class Warrior(Unit):
     def __init__(self, owner: Player, position: list[int]) -> None:
         super().__init__(owner, position)
         self.moves_left = 3
+        self.name = 'Warrior'
 
     def reset_moves(self) -> None:
         self.moves_left = 3
@@ -326,6 +356,7 @@ class Worker(Unit):
     def __init__(self, owner: Player, position: list[int]) -> None:
         super().__init__(owner, position)
         self.moves_left = 8
+        self.name = 'Worker'
 
     def reset_moves(self) -> None:
         self.moves_left = 8
@@ -346,5 +377,5 @@ def to_tilemap(string_map: list[list[str]]) -> list[list[Tile]]:
 # Debug
 if __name__ == '__main__':
     p = [Player('Spain', [0, 0]), Player('Zulu', [10, 4]), Player('Russia', [4, 4])]
-    m = [[GrassTile() for i in range(config.BOARD_WIDTH)] for j in range(config.BOARD_HEIGHT)]
+    m = [[GrassTile() for i in range(BOARD_WIDTH)] for j in range(BOARD_HEIGHT)]
     g = Game(p, m)

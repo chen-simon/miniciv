@@ -3,7 +3,6 @@
 BOARD_WIDTH = 40
 BOARD_HEIGHT = 16
 
-
 # Terrain Tiles
 
 GRASS_TILE = [['#5cb528', '#569e2c', '#54b048'],
@@ -47,3 +46,18 @@ WARRIOR_UNIT = [['', '#eb441e', ''],
 WORKER_UNIT = [['', '#eda915', ''],
                ['', '#dadbd7', ''],
                ['', '', '']]
+
+# Default city names
+DEFAULT_CITY_NAMES = {
+    'Spain': ['Madrid', ],
+    'America': ['Washington', 'New York', 'Philidelphia', 'Boston', 'Baltimore', 'Charleston',
+                'New Orleans', 'Cincinnati', 'Los Angeles'],
+    'Russia': [],
+}
+
+# Infobox rendering
+VIEW_TEXTS = {
+    'city': 'CITY VIEW',
+    'unit': 'UNIT VIEW',
+    'production': 'PRODUCTION VIEW'
+}

@@ -8,14 +8,12 @@ const controlsBox = document.getElementById('controls');
 const listBox = document.getElementById('list');
 const textBox = document.getElementById('text-box');
 
-textBox.disabled = true;
-
 // Game details
 let updateLastFrame = true;
 let isUsersTurn = true;
 
 // Misc
-const validKeys =  ['Space', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'Tab', 'Enter'];
+const validKeys =  ['Space', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'Tab', 'Enter', 'Escape'];
 
 // Functions
 const renderGame = (screen) => {
@@ -50,7 +48,6 @@ const updateGame = async (obj) => {
     
     renderGame(data.screen);
     updateInfo(data);
-    if (data.textBoxDisabled) { textBox.disabled = textBoxDisabled; }
     // Game rendered
     updateLastFrame = true;
 };

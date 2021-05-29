@@ -1,5 +1,6 @@
 """ The game server. """
 from flask import Flask, render_template, url_for, request
+from config import *
 import json
 
 from game import *
@@ -7,7 +8,7 @@ from game import *
 app = Flask(__name__)
 
 p = [Player('Spain', [0, 0]), Player('Zulu', [0, 4]), Player('Russia', [4, 4])]
-m = [[GrassTile() for i in range(config.BOARD_WIDTH)] for j in range(config.BOARD_HEIGHT)]
+m = [[GrassTile() for i in range(BOARD_WIDTH)] for j in range(BOARD_HEIGHT)]
 current_game = Game(p, m)
 
 
@@ -20,7 +21,7 @@ def debug_tile():
 @app.route('/debug/tile/')
 def send_tile():
     import config  # CHANGE THIS CODE TO SEE WHAT TILE YOU ARE LOOKING AT
-    return {'screen': config.ROAD_TILE}
+    return {'screen': ROAD_TILE}
 
 
 # Game
@@ -49,7 +50,7 @@ def game_io():
 
 if __name__ == '__main__':
     p = [Player('Spain', [2, 2]), Player('Russia', [4, 4])]
-    m = [[GrassTile() for i in range(config.BOARD_WIDTH)] for j in range(config.BOARD_HEIGHT)]
+    m = [[GrassTile() for i in range(BOARD_WIDTH)] for j in range(BOARD_HEIGHT)]
     current_game = Game(p, m)
 
     app.run(debug=True)
