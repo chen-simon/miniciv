@@ -7,7 +7,7 @@ import config
 from game import Tile, GrassTile, WaterTile
 
 
-def generate(params: dict) -> list[list[Tile]]:
+def generate(lat: float, long: float, zoom: int) -> list[list[Tile]]:
     """ Given a list of lat-long values and other google maps parameters, generate a map. """
     main_url = 'https://maps.googleapis.com/maps/api/staticmap?'
     tail = '&size=640x256&maptype=roadmap&style=feature:all%7Cvisibility:off&style=feature' \
@@ -16,7 +16,7 @@ def generate(params: dict) -> list[list[Tile]]:
            '.fill%7Ccolor:0x0000FF'
     api_key = '&key=AIzaSyB_NnU8wRTS5S0dFjS_5kUhtuetWqY0xWI'
 
-    params_text = 'center=Toronto&zoom=12'
+    params_text = f'center={lat},{long}&zoom={zoom}'
 
     image = google_maps_url_to_image(main_url + params_text + tail + api_key)
     image.show()
@@ -60,4 +60,4 @@ def google_maps_url_to_image(url: str) -> Image:
 
 # Debug
 if __name__ == '__main__':
-    generate({})
+    generate(42.652579, -73.756232, 15)
