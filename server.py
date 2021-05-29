@@ -40,7 +40,7 @@ def game_io():
     data = json.loads(request.get_data())
 
     # Handle user input to update game state
-    if data['key']:
+    if 'key' in data:
         current_game.handle_user_input(data['key'])
 
     info = current_game.generate_info()

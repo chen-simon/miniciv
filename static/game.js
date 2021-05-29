@@ -36,7 +36,6 @@ const updateInfo = ({title, message, list, controls}) => {
 
 const getInputs = (evt) => {
     if (updateLastFrame && isUsersTurn && validKeys.includes(evt.code)) { 
-        console.log(evt.code);
         updateGame({'key': evt.code}); 
     }
 };
@@ -44,8 +43,8 @@ const getInputs = (evt) => {
 const updateGame = async (obj) => {
     updateLastFrame = false;
     // Async stuff
-    console.log(obj)
-    const response = await fetch('/game/io/', {method: 'POST', body: JSON.stringify({'key': 'ArrowUp'})});
+    console.log(obj);
+    const response = await fetch('/game/io/', {method: 'POST', body: JSON.stringify(obj)});
     const data = await response.json();
 
     
@@ -59,4 +58,4 @@ const updateGame = async (obj) => {
 
 document.addEventListener('keydown', getInputs);
 
-updateGame();
+updateGame({});

@@ -38,6 +38,12 @@ class Game:
         """ Update the current turn to be the turn of the next player. """
         self.current_turn = (self.current_turn + 1) % len(self.players)
 
+    def create_city(self, player: Player, position: list[int]) -> None:
+        """ Create a new city in the game. """
+        new_city = City('Madrid', player)
+        player.cities.append(new_city)
+        self.structures[position[1]][position[0]] = new_city
+
     def render_game(self) -> list[list[str]]:
         """ Renders the game in a (3*BOARD_WIDTH)x(3*BOARD_HEIGHT) pixel matrix of colours in
             the form '#FFFFFF'.
@@ -56,7 +62,7 @@ class Game:
                 unit_vis = config.SETTLER_UNIT if isinstance(unit, Settler) else \
                     (config.WARRIOR_UNIT if isinstance(unit, Warrior) else config.WORKER_UNIT)
 
-                Game._render_vis(unit_vis, [unit.position[1], unit.position[0]], output)
+                Game._render_vis(unit_vis, [unit.position[0], unit.position[1]], output)
 
         return output
 
@@ -79,14 +85,14 @@ class Game:
 
                 if colour != '':
                     output[pos[1] * 3 + y][pos[0] * 3 + x] = colour
-    
+
     def handle_user_input(self, keycode: str) -> None:
         """ Handle user input for a player."""
         self.players[self.current_turn].handle_user_input(keycode, self)
 
-    def generate_info(self):
+    def generate_info(self) -> dict[str, str]:
         """ Generate the info box of the game depending on the current game state."""
-        pass
+        return {}
 
 
 class Player:
@@ -119,12 +125,9 @@ class Player:
 
         self.current_view = 'unit'
 
-    def move_unit(self) -> None:
-        """ Move the current unit in a direction"""
-        # TODO: implement this function
-
-    def destroy_city(self):
-        pass
+    def remove_unit(self, unit: Unit) -> None:
+        """ Delete this unit. """
+        self.units.remove(unit)
 
     def handle_user_input(self, keycode: str, game: Game) -> None:
         """ Handle user input for the current player."""
@@ -133,6 +136,7 @@ class Player:
 
         # UNIT VIEW
         if self.current_view == 'unit' and len(self.units) > 0:
+            print(keycode)
             if keycode == 'Tab':
                 self.current_view = 'city'
             elif keycode == 'Space':
@@ -171,6 +175,7 @@ class GrassTile(Tile):
 
 class WaterTile(Tile):
     """ A water tile. """
+
     def __init__(self) -> None:
         self.vis = config.WATER_TILE
 
@@ -189,8 +194,12 @@ class City(Tile):
     current_production: str
     production_turns_left: int
 
-    def __init__(self) -> None:
+    def __init__(self, name: str, owner: Player) -> None:
         self.vis = config.CITY_TILE
+        self.name = name
+        self.owner = owner
+        self.current_production = ''
+        self.production_turns_left = 0
 
     def set_production(self, unit: str) -> None:
         """ Sets the production of the current city. """
@@ -263,6 +272,7 @@ class Unit:
             return False
 
         self.position = new_position
+        print(new_position)
 
         # Take away a move
         if not isinstance(current_structure, Road):
@@ -286,6 +296,13 @@ class Settler(Unit):
 
     def action(self, game: Game) -> bool:
         """ Found a city on the game board. Return false if illegal move."""
+        if not game.structures[self.position[1]][self.position[0]] \
+                and not isinstance(game.game_map[self.position[1]][self.position[0]], WaterTile):
+            # Creates the city, then removes itself from the game.
+            game.create_city(self.owner, self.position)
+            self.owner.remove_unit(self)
+            return True
+        return False
 
 
 class Warrior(Unit):
