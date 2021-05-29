@@ -2,9 +2,8 @@
  Submission for MLH Hack-cade 2021
  
 
-## Installation
+## Installation Instructions
 
-Instructions listed below
 ```bash
 1. Clone the repository to your machine
 2. Simply run _server.py_
