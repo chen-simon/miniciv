@@ -61,3 +61,6 @@ VIEW_TEXTS = {
     'unit': 'UNIT VIEW',
     'production': 'PRODUCTION VIEW'
 }
+
+# Map generation
+WATER_THRESHOLD = 253

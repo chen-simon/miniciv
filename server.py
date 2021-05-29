@@ -1,8 +1,10 @@
 """ The game server. """
 from flask import Flask, render_template, url_for, request
-from config import *
 import json
 
+
+from config import *
+from map_generation import example_map
 from game import *
 
 app = Flask(__name__)
@@ -50,7 +52,7 @@ def game_io():
 
 if __name__ == '__main__':
     p = [Player('Spain', [2, 2]), Player('Russia', [4, 4])]
-    m = [[GrassTile() for i in range(BOARD_WIDTH)] for j in range(BOARD_HEIGHT)]
+    m = example_map()
     current_game = Game(p, m)
 
     app.run(debug=True)
