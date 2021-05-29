@@ -54,4 +54,7 @@ const updateGame = async (obj) => {
 
 document.addEventListener('keydown', getInputs);
 
-updateGame({});
+// Wait for the game to initialize before asking for data
+window.setTimeout(
+    updateGame({}), 1000
+);
