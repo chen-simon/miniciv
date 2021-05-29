@@ -165,8 +165,8 @@ class Game:
             name = current_unit.name
             message = f"Position: {current_unit.position} ⠀⠀ Moves Left: {current_unit.moves_left}"
             lst = [unit.name for unit in current_player.units]
-            controls = f"SPACE - {current_unit.action_name} ⠀⠀ " + \
-                       "Enter - Switch Unit ⠀⠀ Arrow Keys - Move Unit ⠀⠀ TAB - Switch View ⠀⠀ " + \
+            controls = f"SPACE - {current_unit.action_name} ⠀⠀ " \
+                       "Enter - Switch Unit ⠀⠀ Arrow Keys - Move Unit ⠀⠀ TAB - Switch View ⠀⠀ " \
                        "ESC - End Turn"
         else:
             current_city = current_player.cities[current_player.selected_city]
@@ -175,16 +175,16 @@ class Game:
             lst = [city.name for city in current_player.cities]
 
             if current_player.current_view == 'city':
-                message = f"Position: {current_city.position} ⠀⠀ " + \
-                          f"Production: {current_city.current_production}" + \
+                message = f"Position: {current_city.position} ⠀⠀ " \
+                          f"Production: {current_city.current_production}" \
                           f"({current_city.production_turns_left} Turns left.)"
 
-                controls = "SPACE - Choose Production ⠀⠀ Enter - Switch City ⠀⠀ " + \
+                controls = "SPACE - Choose Production ⠀⠀ Enter - Switch City ⠀⠀ " \
                            "TAB - Switch View ⠀⠀ ESC - End Turn"
             else:  # production view
                 message = f"Choose your Production for {current_city.name} (4 turns per unit)"
 
-                controls = "ArrowUp - Settler ⠀⠀ ArrowLeft - Warrior ⠀⠀ ArrowRight - Worker ⠀⠀ " + \
+                controls = "ArrowUp - Settler ⠀⠀ ArrowLeft - Warrior ⠀⠀ ArrowRight - Worker ⠀⠀ " \
                            "TAB - Switch View ⠀⠀ ESC - End Turn"
 
         return {'title': f"{current_player.name}'s Turn - {current_view_text} - {name}",
@@ -251,15 +251,22 @@ class Player:
                 self.units[self.selected_unit].move_unit(keycode, game)
 
         # CITY VIEW
-        elif self.current_view == 'city':
+        elif self.current_view == 'city' and len(self.cities) > 0:
             if keycode == 'Tab':
                 self.current_view = 'unit'
             elif keycode == 'Space':
                 self.current_view = 'production'
             elif keycode == 'Enter':
                 self.selected_city = (self.selected_city + 1) % len(self.cities)
-            else:  # Movement
-                self.units[self.selected_unit].move_unit(keycode, game)
+
+        # PRODUCTION VIEW
+        elif self.current_view == 'production' and len(self.cities) > 0:
+            if keycode == 'Tab':
+                self.current_view = 'city'
+            elif keycode == 'Space':
+                self.current_view = 'production'
+            elif keycode == 'Enter':
+                self.selected_city = (self.selected_city + 1) % len(self.cities)
 
         # Lastly, update the player state
         self.update_player_state(game)
