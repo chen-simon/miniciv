@@ -1,4 +1,4 @@
-# miniciv
+# MiniCIV
  Submission for MLH Hack-cade 2021
  
 
