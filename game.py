@@ -260,6 +260,7 @@ class Player:
     def remove_unit(self, unit: Unit) -> None:
         """ Delete this unit. """
         self.units.remove(unit)
+        self.selected_unit = 0
 
     def handle_user_input(self, keycode: str, game: Game) -> None:
         """ Handle user input for the current player."""
