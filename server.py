@@ -2,7 +2,6 @@
 from flask import Flask, render_template, url_for, request
 import json
 
-
 from config import *
 from map_generation import example_map
 from game import *
@@ -51,8 +50,8 @@ def game_io():
 
 
 if __name__ == '__main__':
-    p = [Player('Spain', [2, 2]), Player('Russia', [4, 4])]
+    p = [Player('America', [2, 2]), Player('Spain', [4, 4])]
     m = example_map()
-    current_game = Game(p, m)
+    current_game = Game(p, m, enable_discovery_tiles=False)
 
     app.run(debug=True)

@@ -41,7 +41,6 @@ const getInputs = (evt) => {
 const updateGame = async (obj) => {
     updateLastFrame = false;
     // Async stuff
-    console.log(obj);
     const response = await fetch('/game/io/', {method: 'POST', body: JSON.stringify(obj)});
     const data = await response.json();
 

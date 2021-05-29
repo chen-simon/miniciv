@@ -24,14 +24,20 @@ class Game:
     structures: list[list[Optional[Tile]]]
     discovered_tiles: list[list[Optional[Tile]]]
 
-    def __init__(self, players: list[Player], game_map: list[list[Tile]]) -> None:
+    def __init__(self, players: list[Player], game_map: list[list[Tile]],
+                 enable_discovery_tiles: bool = True) -> None:
         self.players = players
         self.game_map = game_map
         self.current_turn = 0
         self.structures = [[None for i in range(BOARD_WIDTH)]
                            for j in range(BOARD_HEIGHT)]
+
+        # Discovery tiles
         self.discovered_tiles = [[CloudTile() for i in range(BOARD_WIDTH)]
-                                 for j in range(BOARD_HEIGHT)]
+                                 for j in range(BOARD_HEIGHT)] if enable_discovery_tiles \
+            else [[None for i in range(BOARD_WIDTH)]
+                  for j in range(BOARD_HEIGHT)]
+
         for player in players:
             for unit in player.units:
                 self.discover_tiles(unit.position)  # Initially discovered tiles
@@ -57,7 +63,7 @@ class Game:
 
     def create_city(self, player: Player, position: list[int]) -> None:
         """ Create a new city in the game. """
-        new_city = City('Madrid', player)
+        new_city = City('Madrid', player, position)
         player.cities.append(new_city)
         self.structures[position[1]][position[0]] = new_city
 
@@ -99,10 +105,10 @@ class Game:
         focused_item = current_player.units[current_player.selected_unit] \
             if focused_view == 'unit' else current_player.cities[current_player.selected_city]
 
-        Game._render_selection_outline(focused_item.position, output)
+        Game._render_selection_outline(focused_item.position, output, current_player)
 
         # Cover the map with undiscovered tile clouds
-        # Game._render_tilemap(self.discovered_tiles, output)
+        Game._render_tilemap(self.discovered_tiles, output)
 
         return output
 
@@ -127,16 +133,17 @@ class Game:
                     output[pos[1] * 3 + y][pos[0] * 3 + x] = colour
 
     @staticmethod
-    def _render_selection_outline(pos: list[int], output: list[list[str]]) -> None:
+    def _render_selection_outline(pos: list[int], output: list[list[str]], player: Player) -> None:
         """ Render the selection outline to the output matrix. """
-        selection_outline = [[OUTLINE_COLOUR if max(i, j) == 6 or min(i, j) == 0 else None
-                              for i in range(7)] for j in range(7)]
+        selection_outline = [[OUTLINE_COLOURS[player.name] if max(i, j) == 6 or min(i, j) == 0
+                              else None for i in range(7)] for j in range(7)]
         for y in range(7):
             for x in range(7):
                 colour = selection_outline[y][x]
 
-                if colour and Game._vis_within_map_border([x, y]):
-                    output[pos[1] * 3 - 2 + y][pos[0] * 3 - 2 + x] = colour
+                vis_pos = [pos[0] * 3 - 2 + x, pos[1] * 3 - 2 + y]
+                if colour and Game._vis_within_map_border(vis_pos):
+                    output[vis_pos[1]][vis_pos[0]] = colour
 
     @staticmethod
     def _vis_within_map_border(vis_pos: list[int]) -> bool:
@@ -153,11 +160,37 @@ class Game:
 
         current_view_text = VIEW_TEXTS[current_player.current_view]
         if current_player.current_view == 'unit':
-            current_name = current_player.units[current_player.selected_unit].name
-        else:
-            current_name = current_player.cities[current_player.selected_city].name
+            current_unit = current_player.units[current_player.selected_unit]
 
-        return {'title': f'{current_view_text} - {current_name}'}
+            name = current_unit.name
+            message = f"Position: {current_unit.position} ⠀⠀ Moves Left: {current_unit.moves_left}"
+            lst = [unit.name for unit in current_player.units]
+            controls = f"SPACE - {current_unit.action_name} ⠀⠀ " + \
+                       "Enter - Switch Unit ⠀⠀ Arrow Keys - Move Unit ⠀⠀ TAB - Switch View ⠀⠀ " + \
+                       "ESC - End Turn"
+        else:
+            current_city = current_player.cities[current_player.selected_city]
+
+            name = current_city.name
+            lst = [city.name for city in current_player.cities]
+
+            if current_player.current_view == 'city':
+                message = f"Position: {current_city.position} ⠀⠀ " + \
+                          f"Production: {current_city.current_production}" + \
+                          f"({current_city.production_turns_left} Turns left.)"
+
+                controls = "SPACE - Choose Production ⠀⠀ Enter - Switch City ⠀⠀ " + \
+                           "TAB - Switch View ⠀⠀ ESC - End Turn"
+            else:  # production view
+                message = f"Choose your Production for {current_city.name} (4 turns per unit)"
+
+                controls = "ArrowUp - Settler ⠀⠀ ArrowLeft - Warrior ⠀⠀ ArrowRight - Worker ⠀⠀ " + \
+                           "TAB - Switch View ⠀⠀ ESC - End Turn"
+
+        return {'title': f"{current_player.name}'s Turn - {current_view_text} - {name}",
+                'message': message,
+                'list': ', '.join(lst),
+                'controls': controls}
 
         # TODO: Fix the thing where when you have no units, you can't be in unit view.
 
@@ -202,6 +235,7 @@ class Player:
 
     def handle_user_input(self, keycode: str, game: Game) -> None:
         """ Handle user input for the current player."""
+
         if keycode == 'Escape':  # The universal
             game.next_turn()
 
@@ -218,9 +252,31 @@ class Player:
 
         # CITY VIEW
         elif self.current_view == 'city':
-            pass
-        else:  # current_view is production
-            pass
+            if keycode == 'Tab':
+                self.current_view = 'unit'
+            elif keycode == 'Space':
+                self.current_view = 'production'
+            elif keycode == 'Enter':
+                self.selected_city = (self.selected_city + 1) % len(self.cities)
+            else:  # Movement
+                self.units[self.selected_unit].move_unit(keycode, game)
+
+        # Lastly, update the player state
+        self.update_player_state(game)
+
+    def update_player_state(self, game: Game) -> None:
+        """ Switches the view or detects if eliminated. """
+        if not self.units:
+            self.current_view = 'city'
+
+        if not self.cities:
+            self.current_view = 'unit'
+
+        if not self.cities and not self.units:
+            self.eliminated = True
+
+            # This isn't very elegant, but I'm running low on hackathon time
+            game.players.remove(self)
 
 
 # TILES
@@ -258,18 +314,21 @@ class City(Tile):
         - owner: The owner of the city.
         - current_production: The unit that this city is currently producing.
         - production_turns_left: The number of turns left until the unit is finished.
+        - position: the position of the city on the board.
     """
     name: str
     owner: Player
     current_production: str
     production_turns_left: int
+    position: list[int]
 
-    def __init__(self, name: str, owner: Player) -> None:
+    def __init__(self, name: str, owner: Player, position: list[int]) -> None:
         self.vis = CITY_TILE
         self.name = name
         self.owner = owner
         self.current_production = ''
         self.production_turns_left = 0
+        self.position = position
 
     def set_production(self, unit: str) -> None:
         """ Sets the production of the current city. """
@@ -309,11 +368,13 @@ class Unit:
         - owner: The player who owns this unit.
         - moves_left: the moves this unit has left for the current turn.
         - position: the (x, y) position of the unit on the game board.
+        - action_name: the action display text of the unit's special action.
     """
     name: str
     owner: Player
     moves_left: int
     position: list[int]
+    action_name: str
 
     def __init__(self, owner: Player, position: list[int]) -> None:
         self.owner = owner
@@ -345,8 +406,8 @@ class Unit:
             new_position[0] += 1
 
         # Make sure you didn't go on water or outside of the map
-        if isinstance(game.game_map[new_position[1]][new_position[0]], WaterTile) \
-                or not game.within_map_border(new_position):
+        if not game.within_map_border(new_position) or \
+                isinstance(game.game_map[new_position[1]][new_position[0]], WaterTile):
             return False
 
         self.position = new_position
@@ -372,6 +433,7 @@ class Settler(Unit):
         super().__init__(owner, position)
         self.moves_left = 4
         self.name = 'Settler'
+        self.action_name = 'Found City'
 
     def reset_moves(self) -> None:
         self.moves_left = 4
@@ -396,6 +458,7 @@ class Warrior(Unit):
         super().__init__(owner, position)
         self.moves_left = 3
         self.name = 'Warrior'
+        self.action_name = 'Guard Tile'
 
     def reset_moves(self) -> None:
         self.moves_left = 3
@@ -412,6 +475,7 @@ class Worker(Unit):
         super().__init__(owner, position)
         self.moves_left = 8
         self.name = 'Worker'
+        self.action_name = 'Build Road'
 
     def reset_moves(self) -> None:
         self.moves_left = 8

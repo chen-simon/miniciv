@@ -52,7 +52,11 @@ CLOUD_TILE = [['#010502', '#010502', '#010003'],
               ['#010005', '#030002', '#010503']]
 
 # 7x7 selection outline
-OUTLINE_COLOUR = '#AAAAFF'
+OUTLINE_COLOURS = {
+    'America': '#9999FF',
+    'Spain': '#FFFF99',
+    'Russia': '#FF9999'
+    }
 
 
 # Default city names
