@@ -47,7 +47,7 @@ const updateGame = async (obj) => {
     
     renderGame(data.screen);
     updateInfo(data);
-    
+
     // Game rendered
     updateLastFrame = true;
 };
@@ -57,5 +57,5 @@ document.addEventListener('keydown', getInputs);
 
 // Wait for the game to initialize before asking for data
 window.setTimeout(
-    updateGame({}), 1000
+    updateGame({}), 3000  // Wait at least 3 seconds for Flask server to initialize the game
 );
