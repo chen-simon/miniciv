@@ -2,9 +2,7 @@
 
 MiniCiv is an 8-bit local-multiplayer browser-game recreation of Sid Meyer's Civilization (1991) where players can play a Civ game with a map they can pick as anywhere in the world. Upon starting their game, players can choose their Civilization and their map using a Google Maps interactive map, and are then put into a game where they can found cities, build roads, create warriors to defend themselves, choose the production of their cities, all like an actual miniature Civ game!
 
-Submission for MLH Hack-cade 2021
-
-[DevPost](https://devpost.com/software/miniciv)
+Submission for MLH Hack-cade 2021 ([Devpost](https://devpost.com/software/miniciv))
  
 Created by [Simon Chen](https://github.com/SimonChenWasTaken) and  [Zhenia Sigayev](https://github.com/zheniasigayev)
 
