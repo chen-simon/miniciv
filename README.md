@@ -9,7 +9,7 @@ Created by [Simon Chen](https://github.com/SimonChenWasTaken) and  [Zhenia Sigay
 ## Installation Instructions
 
 1. Clone the repository to your machine.
-1. Open `api_key.py` and assign `API_KEY` to your google api maps key. (make sure you have google maps static api and javascript api enabled)
+1. Open `api_key.py` and assign your google api maps key to the variable `API_KEY`. (Make sure you have Google Maps Static API and Google Maps Javascript API enabled in your Google Cloud console!)
 1. Either install all the packages listed in `requirements.txt`, or create a virtual environment from them.
 1. Run `server.py`.
 1. Open http://localhost:5000/ in the browser 
